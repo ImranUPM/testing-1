@@ -14,7 +14,7 @@ import altair as alt
 # ---------- Load Data ----------
 @st.cache_data
 def load_data():
-    return pd.read_csv('combined_mental_health_data.csv')
+    return pd.read_csv('filtered_mental_health_data.csv')
 
 df = load_data()
 
@@ -78,27 +78,19 @@ st.markdown("### Demographics")
 d1, d2, d3 = st.columns(3)
 
 with d1:
-    # Normalize Gender into Male, Female, or Other
-    gender_series = df_f['Gender'].fillna('').apply(
-        lambda x: x if x in ['Male', 'Female'] else 'Other'
-    )
-    gender_counts = gender_series.value_counts().reset_index()
+    gender_counts = df_f['Gender'].value_counts().reset_index()
     gender_counts.columns = ['Gender', 'Count']
-
-    # Donut chart for the three categories
     pie = (
         alt.Chart(gender_counts)
         .mark_arc(innerRadius=50)
         .encode(
             theta=alt.Theta(field="Count", type="quantitative"),
-            color=alt.Color(field="Gender", type="nominal",
-                            scale=alt.Scale(domain=['Male','Female','Other'])),
+            color=alt.Color(field="Gender", type="nominal"),
             tooltip=["Gender", "Count"]
         )
         .properties(title="Gender Distribution")
     )
     st.altair_chart(pie, use_container_width=True)
-
 
 with d2:
     hist = (
